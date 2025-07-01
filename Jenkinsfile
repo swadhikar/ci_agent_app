@@ -1,37 +1,31 @@
 pipeline {
   agent any
-
-  environment {
-    GITHUB_TOKEN = credentials('jenkins-cicd') // stored in Jenkins Credentials
-  }
-
   stages {
     stage('Checkout') {
       steps {
+        // Correct way to use SSH credentials with the 'git' step:
         git branch: 'main',
-            url: 'https://github.com/swadhikar/ci_agent_app'
+            url: 'git@github.com:swadhikar/ci_agent_app.git',
+            credentialsId: 'jenkins-ssh-key'
       }
     }
 
     stage('Run Unit Tests') {
       steps {
+        // Ensure 'pytest' is installed in your Jenkins agent environment
         sh 'pytest test_app.py'
       }
     }
 
     stage('Merge PR if Passed') {
       when {
-        expression { env.CHANGE_ID != null }  // Only if this is a PR
+        // This condition correctly checks if the build is for a Pull Request
+        expression { env.CHANGE_ID != null }
       }
       steps {
         script {
+            echo "This step would contain logic to merge the PR, e.g., using GitHub API."
             echo "Code merge simulated!"
-        //   sh """
-        //   curl -X PUT \
-        //     -H "Authorization: token ${GITHUB_TOKEN}" \
-        //     -H "Accept: application/vnd.github+json" \
-        //     https://api.github.com/repos/swadhikar/ci_agent_app/pulls/${env.CHANGE_ID}/merge
-        //   """
         }
       }
     }
