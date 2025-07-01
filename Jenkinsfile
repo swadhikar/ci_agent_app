@@ -17,7 +17,7 @@ pipeline {
       }
     }
 
-    stage('Merge PR if Passed') {
+    stage('Auto-Merge to Main') {
       when {
         // This condition correctly checks if the build is for a Pull Request
         expression { env.CHANGE_ID != null }
