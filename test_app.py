@@ -14,6 +14,12 @@ def test_test_failure():
     assert result["error_type"] == "test_failure"
 
 
+def test_test_failure_2():
+    log = "AssertionError: expected True but got False"
+    result = classify_log(log)
+    assert result["error_type"] == "test_failure"
+
+
 def test_infra_error():
     log = "Connection timed out while connecting to database"
     result = classify_log(log)
