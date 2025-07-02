@@ -38,38 +38,41 @@ pipeline {
       }
       steps {
         script {
-          // Check if PR already exists for this branch
-          def prNumber = sh(
-            script: """
-              gh pr list --state open --head ${env.BRANCH_NAME} --json number --jq '.[0].number'
-            """,
-            returnStdout: true
-          ).trim()
+          withCredentials([string(credentialsId: 'GITHUB_PAT_FOR_GH_CLI', variable: 'GH_TOKEN')]) {
+              // Check if PR already exists for this branch
+              def prNumber = sh(
+                script: """
+                  gh pr list --state open --head ${env.BRANCH_NAME} --json number --jq '.[0].number'
+                """,
+                returnStdout: true
+              ).trim()
 
-          if (prNumber) {
-            echo "PR already exists: #${prNumber}"
-          } else {
-            echo "Creating PR from ${env.BRANCH_NAME} to main..."
-            prNumber = sh(
-              script: """
-                gh pr create --base main --head ${env.BRANCH_NAME} \
-                  --title "Auto PR from Jenkins: ${env.BRANCH_NAME}" \
-                  --body "Auto-created PR after passing lint and unit tests." \
-                  --json number --jq '.number'
-              """,
-              returnStdout: true
-            ).trim()
-            echo "Created PR: #${prNumber}"
+
+              if (prNumber) {
+                echo "PR already exists: #${prNumber}"
+              } else {
+                echo "Creating PR from ${env.BRANCH_NAME} to main..."
+                prNumber = sh(
+                  script: """
+                    gh pr create --base main --head ${env.BRANCH_NAME} \
+                      --title "Auto PR from Jenkins: ${env.BRANCH_NAME}" \
+                      --body "Auto-created PR after passing lint and unit tests." \
+                      --json number --jq '.number'
+                  """,
+                  returnStdout: true
+                ).trim()
+                echo "Created PR: #${prNumber}"
+              }
+
+              // Auto-merge the PR
+              echo "Attempting to auto-merge PR #${prNumber}"
+              sh """
+                gh pr merge ${prNumber} --merge \
+                  --subject "Pylint and UT complete" \
+                  --body "This PR was auto-merged by Jenkins after all checks passed."
+              """
+              echo "Auto-merge complete"
           }
-
-          // Auto-merge the PR
-          echo "Attempting to auto-merge PR #${prNumber}"
-          sh """
-            gh pr merge ${prNumber} --merge \
-              --subject "Pylint and UT complete" \
-              --body "This PR was auto-merged by Jenkins after all checks passed."
-          """
-          echo "Auto-merge complete"
         }
       }
     }
