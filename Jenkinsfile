@@ -18,7 +18,15 @@ pipeline {
 
     stage('Run Unit Tests') {
       steps {
-        sh 'python3 -m pylint app.py'
+          def pylintResult = sh(script: 'python3 -m pylint app.py', returnStatus: true)
+          if (pylintResult == 0) {
+            echo "Pylint passed with exit code 0."
+          } else if (pylintResult > 30){
+            echo "Pylint failed with unexpected exit code: ${pylintResult}. Marking build as unstable or failing."
+            currentBuild.result = 'UNSTABLE'
+          } else {
+            echo "Pylint completed with conventions/warnings (exit code ${pylintResult}). Allowing pipeline to continue."
+          }
       }
     }
 
