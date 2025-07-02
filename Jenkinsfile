@@ -42,7 +42,7 @@ pipeline {
               // Check if PR already exists for this branch
               def prNumber = sh(
                 script: """
-                  gh pr list --state open --head ${env.BRANCH_NAME} --json number --jq '.[0].number'
+                  gh pr list --state open --head ${env.BRANCH_NAME}
                 """,
                 returnStdout: true
               ).trim()
@@ -56,8 +56,7 @@ pipeline {
                   script: """
                     gh pr create --base main --head ${env.BRANCH_NAME} \
                       --title "Auto PR from Jenkins: ${env.BRANCH_NAME}" \
-                      --body "Auto-created PR after passing lint and unit tests." \
-                      --json number --jq '.number'
+                      --body "Auto-created PR after passing lint and unit tests."
                   """,
                   returnStdout: true
                 ).trim()
