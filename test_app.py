@@ -1,5 +1,7 @@
+import os
+
 import pytest
-from app import classify_log
+from app import classify_log, get_absolute_path
 
 
 def test_dependency_error():
@@ -30,3 +32,17 @@ def test_unknown():
     log = "Some random unclassified error"
     result = classify_log(log)
     assert result["error_type"] == "unknown"
+
+def test_absolute_path():
+    log = "error"
+    result = get_absolute_path(log)
+    assert result == "not found"
+
+def test_absolute_path_2():
+    log = "."
+    result = get_absolute_path(log)
+    abs_path = os.path.abspath(os.getcwd())
+    assert result == abs_path
+
+
+

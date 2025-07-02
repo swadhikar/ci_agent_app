@@ -1,4 +1,5 @@
 import re
+import os
 
 
 def classify_log(log: str) -> dict:
@@ -31,3 +32,18 @@ def classify_log(log: str) -> dict:
         suggested_fix = "Review the full log manually."
 
     return {"error_type": error_type, "summary": summary, "suggested_fix": suggested_fix}
+
+
+def get_absolute_path(directory: str) -> str:
+    """
+    Given the directory returns absolute path
+
+    Args:
+        directory: path
+
+    Returns:
+        Absolute path for current directory
+    """
+    if os.path.exists(directory):
+        return os.path.abspath(directory)
+    return 'not found'
