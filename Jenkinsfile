@@ -18,6 +18,7 @@ pipeline {
 
     stage('Run Unit Tests') {
       steps {
+        script { // <--- ADD THIS 'script' BLOCK
           def pylintResult = sh(script: 'python3 -m pylint app.py', returnStatus: true)
           if (pylintResult == 0) {
             echo "Pylint passed with exit code 0."
@@ -27,6 +28,7 @@ pipeline {
           } else {
             echo "Pylint completed with conventions/warnings (exit code ${pylintResult}). Allowing pipeline to continue."
           }
+        }
       }
     }
 
