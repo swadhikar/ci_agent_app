@@ -18,7 +18,7 @@ pipeline {
 
     stage('Run Unit Tests') {
       steps {
-        sh 'python3 -m pylint test_app.py'
+        sh 'python3 -m pylint app.py'
       }
     }
 

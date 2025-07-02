@@ -1,0 +1,7 @@
+# .pylintrc
+
+[REPORTS]
+# Minimum score to pass.
+# Pylint will exit with a non-zero code (indicating failure)
+# if the calculated score is below this value.
+min-score=8.0
