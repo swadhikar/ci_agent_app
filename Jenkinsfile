@@ -76,4 +76,22 @@ pipeline {
       }
     }
   }
+  post {
+        success {
+            script {
+                // Assuming GH_TOKEN is set as env var or Jenkins credential
+                def prNumber = sh(
+                    script: "gh pr list --head ${env.BRANCH_NAME} --state merged",
+                    returnStdout: true
+                ).trim()
+
+                if (prNumber) {
+                    echo "PR #${prNumber} was merged. Cleaning up branch ${env.BRANCH_NAME}..."
+                    sh "git push origin --delete ${env.BRANCH_NAME}"
+                } else {
+                    echo "PR is not merged yet. Skipping branch cleanup."
+                }
+            }
+        }
+    }
 }
