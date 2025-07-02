@@ -34,8 +34,8 @@ pipeline {
 
     stage('Create and Merge Pull Request') {
       when {
-        expression { return env.BRANCH_NAME != 'main' }
-      }
+            branch pattern: "^feature/.*", comparator: "REGEXP"
+        }
       steps {
         script {
           withCredentials([string(credentialsId: 'GITHUB_PAT_FOR_GH_CLI', variable: 'GH_TOKEN')]) {
@@ -79,20 +79,22 @@ pipeline {
   post {
         success {
             script {
-                 withCredentials([string(credentialsId: 'GITHUB_PAT_FOR_GH_CLI', variable: 'GH_TOKEN')]) {
-                    // Assuming GH_TOKEN is set as env var or Jenkins credential
-                    def prNumber = sh(
-                        script: "gh pr list --head ${env.BRANCH_NAME} --state merged | grep ${env.BRANCH_NAME}",
-                        returnStdout: true
-                    ).trim()
+                 if (env.BRANCH_NAME ==~ /^feature\/.*/) {
+                     withCredentials([string(credentialsId: 'GITHUB_PAT_FOR_GH_CLI', variable: 'GH_TOKEN')]) {
+                        // Assuming GH_TOKEN is set as env var or Jenkins credential
+                        def prNumber = sh(
+                            script: "gh pr list --head ${env.BRANCH_NAME} --state merged | grep ${env.BRANCH_NAME}",
+                            returnStdout: true
+                        ).trim()
 
-                    if (prNumber) {
-                        echo "PR #${prNumber} was merged. Cleaning up branch ${env.BRANCH_NAME}..."
-                        sh "git push origin --delete ${env.BRANCH_NAME} "
-                    } else {
-                        echo "PR is not merged yet. Skipping branch cleanup."
+                        if (prNumber) {
+                            echo "PR #${prNumber} was merged. Cleaning up branch ${env.BRANCH_NAME}..."
+                            sh "git push origin --delete ${env.BRANCH_NAME} "
+                        } else {
+                            echo "PR is not merged yet. Skipping branch cleanup."
+                        }
                     }
-                }
+                 }
             }
         }
     }
