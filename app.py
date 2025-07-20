@@ -58,6 +58,8 @@ def get_agent_label(label: str = 'bare_metal', force=False) -> str:
 
         Forces bare_metal when force is set
     """
-    if random.random() < 0.3 or force:
+    if random.random() < 0.5 or force:
         return label
     return 'aws'
+
+
