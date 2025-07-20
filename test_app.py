@@ -1,7 +1,6 @@
 import os
 
-import pytest
-from app import classify_log, get_absolute_path
+from app import classify_log, get_absolute_path, get_agent_label
 
 
 def test_dependency_error():
@@ -33,10 +32,12 @@ def test_unknown():
     result = classify_log(log)
     assert result["error_type"] == "unknown"
 
+
 def test_absolute_path():
     log = "error"
     result = get_absolute_path(log)
     assert result == "not found"
+
 
 def test_absolute_path_2():
     log = "."
@@ -45,4 +46,11 @@ def test_absolute_path_2():
     assert result == abs_path
 
 
+def test_get_bare_metal():
+    """Test to always return baremetal node"""
+    assert get_agent_label(force=True) == 'bare_metal'
 
+
+def test_get_node():
+    """Test to either return baremetal or aws"""
+    assert get_agent_label() in ('aws', 'bare_metal')

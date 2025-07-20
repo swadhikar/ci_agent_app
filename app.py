@@ -1,4 +1,5 @@
 import re
+import random
 import os
 
 
@@ -47,3 +48,14 @@ def get_absolute_path(directory: str) -> str:
     if os.path.exists(directory):
         return os.path.abspath(directory)
     return 'not found'
+
+
+def get_agent_label(label: str = 'bare_metal', force=False) -> str:
+    """
+        Either return baremetal or aws label for jenkins agent
+
+        Forces bare_metal when force is set
+    """
+    if random.random() < 0.3 or force:
+        return label
+    return 'aws'
