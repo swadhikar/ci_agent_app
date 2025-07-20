@@ -54,3 +54,13 @@ def test_get_bare_metal():
 def test_get_node():
     """Test to either return baremetal or aws"""
     assert get_agent_label() in ('aws', 'bare_metal')
+
+def test_get_node_unknown():
+    """Test to either return baremetal or aws"""
+    assert get_agent_label('unknown', force=False) in ('unknown', 'aws', 'bare_metal')
+
+def test_get_node_unknown_force():
+    """Test to either return baremetal or aws"""
+    assert get_agent_label('unknown', force=True) == 'unknown'
+
+
